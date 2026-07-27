@@ -150,13 +150,26 @@ nav ul a:hover{color:var(--sand);
 .hero{
   position:relative;
   padding:110px 32px 90px;
-  background:linear-gradient(180deg, rgba(31,53,24,0.98), rgba(44,86,43,0.93) 40%, rgba(233,218,186,0.18) 100%);
+  background:linear-gradient(180deg, rgba(18,32,16,0.86), rgba(38,70,36,0.82) 38%, rgba(233,218,186,0.18) 100%), url("../assets/riverside-garden.jpg");
+  background-size:cover;
+  background-position:center;
   overflow:hidden;
+}
+.hero::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:url("../assets/riverside-garden.jpg") center/cover no-repeat;
+  filter:blur(18px) saturate(1.2);
+  opacity:0.42;
+  transform:scale(1.08);
+  z-index:0;
 }
 .hero::before{
   content:'';
   position:absolute;
   inset:0;
+  z-index:1;
   background-image:
     radial-gradient(circle at 15% 20%, rgba(255,255,255,0.08) 0%, transparent 16%),
     radial-gradient(circle at 90% 20%, rgba(255,255,255,0.05) 0%, transparent 15%);
@@ -181,32 +194,44 @@ nav ul a:hover{color:var(--sand);
 .hero-ctas{display:flex; gap:14px; flex-wrap:wrap;}
 .hero-photo{
   width:100%;
-  min-height:420px;
-  border-radius:24px;
+  min-height:460px;
+  border-radius:28px;
   position:relative;
   overflow:hidden;
-  box-shadow:0 30px 80px rgba(18,32,17,0.28);
-  background:var(--paper);
-  animation:float 10s ease-in-out infinite alternate;
+  box-shadow:0 30px 90px rgba(18,32,17,0.28);
+  background:linear-gradient(180deg, rgba(8,22,11,0.85), rgba(27,51,28,0.65));
+  animation:float 11s ease-in-out infinite alternate;
+}
+.hero-photo::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:url("../assets/riverside-garden.jpg") center/cover no-repeat;
+  filter:blur(18px) brightness(0.8) saturate(1.15);
+  opacity:0.48;
+  transform:scale(1.05);
 }
 .hero-photo img{
+  position:relative;
   width:100%;
   height:auto;
-  object-fit:contain;
+  object-fit:cover;
   display:block;
-  transition:transform 0.6s ease;
+  transition:transform 0.6s ease, filter 0.6s ease;
+  filter:brightness(1) contrast(1.02);
 }
-.hero-photo:hover img{transform:scale(1.03);}
+.hero-photo:hover img{transform:scale(1.04);}
 .hero-photo .tag{
   position:absolute;
   left:16px;
   bottom:16px;
   font-family:'IBM Plex Mono', monospace;
   font-size:0.78rem;
-  color:var(--paper);
-  background:rgba(12,34,16,0.8);
-  padding:8px 12px;
+  color:var(--forest);
+  background:rgba(242,236,212,0.94);
+  padding:10px 14px;
   border-radius:999px;
+  box-shadow:0 10px 30px rgba(18,32,17,0.14);
 }
 .hero-stats{
   display:flex; gap:0;
@@ -369,40 +394,61 @@ section{padding:88px 0; position:relative;}
 /* ---------- Gallery ---------- */
 .gallery-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns:repeat(3, minmax(220px, 1fr));
+  grid-auto-rows:220px;
   gap:18px;
 }
 .gallery-grid .cell{
-  border-radius:22px;
+  position:relative;
+  border-radius:26px;
   overflow:hidden;
-  background:var(--paper);
-  box-shadow:0 16px 38px rgba(18,32,17,0.14);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:14px;
-  transition:transform 0.25s ease, box-shadow 0.25s ease;
+  background:rgba(242,237,226,0.92);
+  border:1px solid rgba(255,255,255,0.7);
+  box-shadow:0 26px 54px rgba(18,32,17,0.16);
+  transition:transform 0.3s ease, box-shadow 0.3s ease;
 }
 .gallery-grid .cell:hover{
   transform:translateY(-6px);
-  box-shadow:0 24px 46px rgba(18,32,17,0.18);
+  box-shadow:0 32px 62px rgba(18,32,17,0.2);
 }
+.gallery-grid .cell::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.18));
+  opacity:0.18;
+  transition:opacity 0.25s ease;
+}
+.gallery-grid .cell:hover::before{opacity:0.08;}
 .gallery-grid .cell img,
 .gallery-grid .cell video{
   width:100%;
-  height:auto;
-  max-height:420px;
-  object-fit:contain;
+  height:100%;
+  object-fit:cover;
   display:block;
 }
-.gallery-grid .cell video{
-  background:#000;
+.gallery-grid .cell video{background:#000;}
+.gallery-grid .cell--featured{grid-column:span 2; grid-row:span 2;}
+.gallery-grid .cell--wide{grid-column:span 2;}
+.gallery-grid .cell--tall{grid-row:span 2;}
+.gallery-grid .cell .gallery-label{
+  position:absolute;
+  left:18px;
+  bottom:18px;
+  z-index:2;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:#fff;
+  font-size:0.82rem;
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(19,45,22,0.78);
+  backdrop-filter:blur(8px);
 }
-.gallery-grid .cell:nth-child(3n){background:var(--paper);}
-.gallery-grid .cell:nth-child(5n){background:var(--paper);}
 .gallery-foot{
   display:flex; justify-content:space-between; align-items:center;
-  margin-top:22px; font-size:0.85rem; color:var(--ink-soft);
+  margin-top:24px; font-size:0.9rem; color:var(--ink-soft);
 }
 .gallery-foot .ig{
   font-family:'IBM Plex Mono', monospace; color:var(--river);
