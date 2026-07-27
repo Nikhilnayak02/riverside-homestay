@@ -1,0 +1,7 @@
+{
+  "feeds": [
+    ""  
+  ],
+  "notes": "Add OTA iCal feed URLs into the feeds array. Examples: Booking.com, Airbnb iCal export URLs. Leave empty strings or remove entries you don't use. The GitHub Action will fetch these and create combined calendar files.
+"
+}

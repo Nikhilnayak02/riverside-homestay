@@ -1,0 +1,12 @@
+{
+  "name": "riverside-calendar-tools",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build-calendar": "node fetch-combine-ical.js"
+  },
+  "dependencies": {
+    "ical-generator": "^4.0.0",
+    "node-ical": "^0.15.1"
+  }
+}

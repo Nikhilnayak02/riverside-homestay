@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Riverside Homestay — Calendar</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .calendar-wrap { max-width:900px; margin:28px auto; padding:18px; }
+    .event { border-bottom:1px solid #eee; padding:12px 0; }
+    .muted { color:#666 }
+  </style>
+</head>
+<body>
+  <div class="calendar-wrap">
+    <h1>Booking calendar (combined)</h1>
+    <p class="muted">This page shows bookings aggregated from configured OTA iCal feeds. To subscribe, use the iCal URL below.</p>
+    <p><a href="/data/calendar.ics">Subscribe to combined iCal</a></p>
+    <div id="events">Loading…</div>
+    <hr>
+    <p class="muted">To enable syncing, add your OTA iCal URLs to <code>data/calendar-config.json</code> in the repo. The scheduled workflow will pull them and update this feed.</p>
+  </div>
+  <script>
+    async function load() {
+      try {
+        const res = await fetch('/data/calendar.json', {cache:'no-store'});
+        const json = await res.json();
+        const el = document.getElementById('events');
+        if (!json.events || json.events.length===0) { el.innerHTML = '<p>No bookings found.</p>'; return; }
+        el.innerHTML = json.events.slice(0,50).map(ev=>{
+          const s = new Date(ev.start).toLocaleString();
+          const e = ev.end? new Date(ev.end).toLocaleString():'';
+          return `<div class="event"><strong>${ev.summary}</strong><div class="muted">${s}${e? ' — ' + e: ''}</div><div>${ev.description||''}</div></div>`;
+        }).join('');
+      } catch (e) { document.getElementById('events').innerText = 'Failed to load calendar'; }
+    }
+    load();
+  </script>
+</body>
+</html>
