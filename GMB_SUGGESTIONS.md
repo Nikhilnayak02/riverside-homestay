@@ -38,3 +38,4 @@
 
 ---
 I can also format these into a step-by-step Google Business Profile claim checklist and include the images pre-sized for upload (appropriate aspect ratios). Want me to do that next?
+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
