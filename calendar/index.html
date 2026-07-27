@@ -16,25 +16,63 @@
     <h1>Booking calendar (combined)</h1>
     <p class="muted">This page shows bookings aggregated from configured OTA iCal feeds. To subscribe, use the iCal URL below.</p>
     <p><a href="/data/calendar.ics">Subscribe to combined iCal</a></p>
-    <div id="events">Loading…</div>
+    <div style="margin:14px 0">
+      <strong>Filter rooms:</strong>
+      <span id="room-filters"></span>
+    </div>
+    <div id="calendar"></div>
     <hr>
     <p class="muted">To enable syncing, add your OTA iCal URLs to <code>data/calendar-config.json</code> in the repo. The scheduled workflow will pull them and update this feed.</p>
   </div>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
   <script>
-    async function load() {
-      try {
-        const res = await fetch('/data/calendar.json', {cache:'no-store'});
-        const json = await res.json();
-        const el = document.getElementById('events');
-        if (!json.events || json.events.length===0) { el.innerHTML = '<p>No bookings found.</p>'; return; }
-        el.innerHTML = json.events.slice(0,50).map(ev=>{
-          const s = new Date(ev.start).toLocaleString();
-          const e = ev.end? new Date(ev.end).toLocaleString():'';
-          return `<div class="event"><strong>${ev.summary}</strong><div class="muted">${s}${e? ' — ' + e: ''}</div><div>${ev.description||''}</div></div>`;
-        }).join('');
-      } catch (e) { document.getElementById('events').innerText = 'Failed to load calendar'; }
+    let rooms = [];
+    let events = [];
+    const roomColors = ['#2b8a3e','#0b66c3','#b36b00','#8a2be2'];
+
+    async function loadData() {
+      const [rRes, eRes] = await Promise.all([
+        fetch('/data/rooms.json', {cache:'no-store'}),
+        fetch('/data/calendar.json', {cache:'no-store'})
+      ]);
+      rooms = await rRes.json();
+      const cal = await eRes.json();
+      events = (cal.events || []).map(ev => ({ id: ev.uid, title: ev.summary, start: ev.start, end: ev.end, extendedProps: { room: ev.room || null, raw: ev } }));
     }
-    load();
+
+    function renderFilters(container) {
+      container.innerHTML = rooms.map((r,i)=>{
+        return `<label style="margin-right:12px"><input type="checkbox" data-room="${r.id}" checked> ${r.name}</label>`;
+      }).join('');
+      container.querySelectorAll('input[type=checkbox]').forEach(cb => cb.addEventListener('change', refreshCalendar));
+    }
+
+    function refreshCalendar() {
+      const active = Array.from(document.querySelectorAll('#room-filters input[type=checkbox]:checked')).map(i=>i.getAttribute('data-room'));
+      const filtered = events.filter(ev => { if (!ev.extendedProps.room) return true; return active.includes(ev.extendedProps.room); });
+      calendar.refetchEvents();
+      calendar.removeAllEvents();
+      calendar.addEventSource(filtered);
+    }
+
+    let calendar;
+    async function init() {
+      await loadData();
+      const filters = document.getElementById('room-filters');
+      renderFilters(filters);
+
+      const calendarEl = document.getElementById('calendar');
+      calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
+        events: events.map(ev=>({ ...ev, color: ev.extendedProps.room ? roomColors[rooms.findIndex(r=>r.id===ev.extendedProps.room)%roomColors.length] : undefined })),
+        eventDisplay: 'block',
+        height: 'auto'
+      });
+      calendar.render();
+    }
+    init().catch(e=>{ document.getElementById('calendar').innerText = 'Failed to load calendar.'; console.error(e); });
   </script>
 </body>
 </html>

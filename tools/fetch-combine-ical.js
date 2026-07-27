@@ -7,6 +7,7 @@ const ROOT = path.resolve(__dirname, '..');
 const CONFIG = path.join(ROOT, 'data', 'calendar-config.json');
 const OUT_ICS = path.join(ROOT, 'data', 'calendar.ics');
 const OUT_JSON = path.join(ROOT, 'data', 'calendar.json');
+const ROOMS_FILE = path.join(ROOT, 'data', 'rooms.json');
 
 async function fetchText(url) {
   try {
@@ -19,14 +20,26 @@ async function fetchText(url) {
   }
 }
 
-function normalizeEvent(ev) {
+function normalizeEvent(ev, roomMatchers) {
+  const summary = ev.summary || 'Booking';
+  const location = ev.location || '';
+  let matchedRoom = null;
+  const textToCheck = (summary + ' ' + location).toLowerCase();
+  for (const r of roomMatchers) {
+    for (const kw of r.keywords) {
+      if (textToCheck.includes(kw.toLowerCase())) { matchedRoom = r.id; break; }
+    }
+    if (matchedRoom) break;
+  }
+
   return {
-    uid: ev.uid || `${ev.summary}-${ev.start}`,
+    uid: ev.uid || `${summary}-${ev.start}`,
     start: ev.start ? new Date(ev.start).toISOString() : null,
     end: ev.end ? new Date(ev.end).toISOString() : null,
-    summary: ev.summary || ev.summary || 'Booking',
+    summary,
     description: ev.description || '',
-    location: ev.location || ''
+    location,
+    room: matchedRoom
   };
 }
 
@@ -35,6 +48,7 @@ async function main() {
   const feeds = Array.isArray(cfg.feeds) ? cfg.feeds.filter(Boolean) : [];
 
   const eventsByUid = new Map();
+  const roomMatchers = (() => { try { return JSON.parse(fs.readFileSync(ROOMS_FILE,'utf8')); } catch(e){ return []; }})();
 
   for (const url of feeds) {
     console.log('Fetching', url);
@@ -45,7 +59,7 @@ async function main() {
       for (const k of Object.keys(parsed)) {
         const item = parsed[k];
         if (item.type === 'VEVENT') {
-          const e = normalizeEvent(item);
+          const e = normalizeEvent(item, roomMatchers);
           eventsByUid.set(e.uid, e);
         }
       }

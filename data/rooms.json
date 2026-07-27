@@ -1,0 +1,5 @@
+[
+  { "id": "room-1", "name": "Garden View Room", "keywords": ["Garden", "garden view", "garden-room"] },
+  { "id": "room-2", "name": "River View Room", "keywords": ["River", "river view", "river-room"] },
+  { "id": "room-3", "name": "Courtyard Room", "keywords": ["Courtyard", "courtyard", "patio"] }
+]
