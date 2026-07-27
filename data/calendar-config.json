@@ -1,7 +1,6 @@
 {
   "feeds": [
-    ""  
+    "https://www.calendarlabs.com/ical-calendar/ics/76/India_Holidays.ics"
   ],
-  "notes": "Add OTA iCal feed URLs into the feeds array. Examples: Booking.com, Airbnb iCal export URLs. Leave empty strings or remove entries you don't use. The GitHub Action will fetch these and create combined calendar files.
-"
+  "notes": "Add OTA iCal feed URLs into the feeds array. Examples: Booking.com, Airbnb iCal export URLs. Leave empty strings or remove entries you don't use. The GitHub Action will fetch these and create combined calendar files. For testing, a public India holidays iCal is included."
 }
