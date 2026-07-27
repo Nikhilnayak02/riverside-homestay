@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const ical = require('node-ical');
-const icalGen = require('ical-generator');
+let icalGen = require('ical-generator');
+if (icalGen && typeof icalGen !== 'function' && icalGen.default) icalGen = icalGen.default;
 
 const ROOT = path.resolve(__dirname, '..');
 const CONFIG = path.join(ROOT, 'data', 'calendar-config.json');
