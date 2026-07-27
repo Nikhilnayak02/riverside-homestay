@@ -22,7 +22,7 @@ jobs:
 
       - name: Install
         working-directory: tools
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Build calendar
         run: node tools/fetch-combine-ical.js
