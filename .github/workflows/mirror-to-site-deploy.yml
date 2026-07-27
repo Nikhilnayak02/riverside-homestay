@@ -1,0 +1,27 @@
+name: Mirror gh-pages to site-deploy
+
+on:
+  push:
+    branches: [ gh-pages ]
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Mirror to site-deploy
+        env:
+          DEPLOY_PAT: ${{ secrets.DEPLOY_PAT }}
+        run: |
+          if [ -z "${DEPLOY_PAT}" ]; then
+            echo "DEPLOY_PAT is not set. Please add a Personal Access Token as the secret DEPLOY_PAT.";
+            exit 1;
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add site-deploy https://x-access-token:${DEPLOY_PAT}@github.com/Nikhilnayak02/site-deploy.git
+          git push site-deploy gh-pages:gh-pages --force
